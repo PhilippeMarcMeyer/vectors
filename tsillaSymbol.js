@@ -65,6 +65,29 @@ function draw() {
 	line(0,0,-20,0);
 	line(-20,0,-29,-2);
 	pop();
+	
+	var angle = 1;
+	push();
+	stroke(255,0,0);
+	var r = Math.floor(centralRadius);
+	translate(20,centralRadius+16);
+
+	//rotate(-1);
+	strokeWeight(4);
+	var a = 8;
+	var b = 1.8;
+	var x,y;
+	for(var i = 0; i <400;i++){
+		r = a*Math.pow(b,angle);
+		x = cos(angle)*r;
+		y = sin(angle)*r;
+		point(x, y)
+		angle += 0.02;
+	}
+	pop();
+	
+	
+	
 }
 
 
