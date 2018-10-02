@@ -24,9 +24,8 @@ function setup() {
 
 function draw() {
 	translate(width / 2, height / 2);
-	background(0);
-	stroke(255);
-	fill(255);
+	background(255);
+	stroke(0);
 	noFill();
 	strokeWeight(5);
 	var w = globals.baseW / 2;
@@ -40,36 +39,32 @@ function draw() {
 	var firstLinePtrA = {x:-w/2,y:-top};
 	var firstLinePtrB = {x:w/2,y:-top};
 	curve(controlPoint1.x, controlPoint1.y, firstLinePtrA.x, firstLinePtrA.y, firstLinePtrB.x, firstLinePtrB.y, controlPoint2.x, controlPoint2.y);
-	point(controlPoint1.x, controlPoint1.y)
-	point(controlPoint2.x, controlPoint2.y)
-	//line(firstLinePtrB.x, firstLinePtrB.y,-centralRadius/2,firstLinePtrB.y+w);
-	arc(w/2+delta2-5,w-delta2-2,w+h-delta2,w*3,PI+QUARTER_PI+0.08,PI+HALF_PI);
-	point(0,delta+delta2);
-	arc(0,delta+delta2,centralRadius,centralRadius,0,PI*2);
 
-}
+	arc(w/2+delta2-5,w-delta2-2,w+h-delta2,w*3,PI+QUARTER_PI-0.08,PI+HALF_PI);
+	
+	var angle = -1.9;
+	push();
+	var r = Math.floor(centralRadius/3);
+	translate(-9,delta+20);
 
-/*
-
-function ellipseLine(dash,weight){
-	var nrPoints = dash.len;
-	var xDiff = dash.end.x - dash.start.x ;
-	var yDiff = dash.end.y - dash.start.y ;
-	var len = Math.floor(Math.sqrt(xDiff*xDiff + yDiff*yDiff));
-	
-	xDiff = xDiff/len;
-	yDiff =  yDiff/len;
-	
-	var x = dash.start.x;
-	var y = dash.start.y;
-	var extra = dash.round == 0 ? weight : 0;
-	
-	for(var i = 0; i < nrPoints;i++){
-		 y+= yDiff;
-		 x+= xDiff;
-		ellipse(x,y,weight+extra+1,weight+extra);
-		if(extra > 0 && i% 3 == 0) extra--;
+	rotate(-1);
+	strokeWeight(4);
+	var a = r ;
+	var b = 0.89;
+	var x,y;
+	for(var i = 0; i <1150;i++){
+		r = a*Math.pow(b,angle);
+		x = cos(angle)*r;
+		y = sin(angle)*r;
+		point(x, y)
+		angle -= 0.01;
 	}
-	ellipse(dash.end.x,dash.end.y,weight,weight);
+	strokeWeight(4);
+	translate(x,y);
+	rotate(1);
+	line(0,0,-20,0);
+	line(-20,0,-29,-2);
+	pop();
 }
-*/
+
+
