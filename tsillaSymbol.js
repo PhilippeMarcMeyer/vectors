@@ -13,8 +13,6 @@ var globals = {
 	strokeWeight : 5
 };
 
-
-
 function setup() {
     var mode = (globals.mode == "WEBGL") ? WEBGL : P2D;
 	var cnv = createCanvas(globals.mainWidth,globals.mainHeight,mode);
@@ -45,7 +43,7 @@ function spiral(startAngle,startPoint,angleOffset,nrPoints,a,b,sign,startFct){
 }
 
 function spiralOfLength(startAngle,startPoint,angleOffset,maxLengthInLine,a,b,sign,startFct){
-	var x,y;
+	var x,y,prevX,prevY;
 	var lastSpiralPoint = {x:0,y:0};
 	sign = sign || 1;
 	if(startFct) startFct();
@@ -53,11 +51,17 @@ function spiralOfLength(startAngle,startPoint,angleOffset,maxLengthInLine,a,b,si
 	translate(startPoint.x, startPoint.y);
     var nrPoints = 10000;
 	var angle = startAngle;
-	for(var i = 0; i <nrPoints;i++){
+	var prevX = 0;
+	r = a*Math.pow(b,angle);
+	prevX = sign*cos(angle)*r;
+	prevY = sign*sin(angle)*r;
+	for(var i = 1; i < nrPoints;i++){
 		r = a*Math.pow(b,angle);
 		x = sign*cos(angle)*r;
 		y = sign*sin(angle)*r;
-		point(x, y);
+		line(prevX,prevY,x,y);
+		prevX = x;
+		prevY = y;
 		angle += angleOffset;
 		var len = getLineLength(startPoint.x,startPoint.y,x,y);
 		if(len >= maxLengthInLine) {
@@ -111,9 +115,9 @@ function draw() {
 	curve(controlPoint1.x, controlPoint1.y, firstLinePtrA.x, firstLinePtrA.y, firstLinePtrB.x, firstLinePtrB.y, controlPoint2.x, controlPoint2.y);
 	
     var spiralStartingPoint = {x:-delta12,y:centralRadius};
-	var len = round(getLineLength(spiralStartingPoint.x,spiralStartingPoint.y,0,0))+1;
+	var len = round(getLineLength(spiralStartingPoint.x,spiralStartingPoint.y,0,0));
 	
-	var lastSpiralPoint = spiralOfLength(-3,spiralStartingPoint,-0.01,delta+len,centralRadius/3, 0.89,1,function(){
+	var lastSpiralPoint = spiralOfLength(-3,spiralStartingPoint,-0.1,delta+len,centralRadius/3, 0.89,1,function(){
 			stroke(0);
 		});
 		
@@ -124,7 +128,5 @@ function draw() {
 		var horizontalCurveEndPoint = {x:firstLinePtrB.x, y:firstLinePtrB.y};
 		// we invert the control point (only one control point btw)
 		curve(-firstLinePtrA.x, -firstLinePtrA.y, spiralStartingPoint.x, spiralStartingPoint.y, firstLinePtrB.x, firstLinePtrB.y, -firstLinePtrA.x, -firstLinePtrA.y);
-	
-
 }
 
