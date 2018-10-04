@@ -4,13 +4,24 @@ DATE : 2018-10-02
 */
 
 var globals = {
-	mainHeight : 480,
+	mainHeight : 540,
 	mainWidth : 480,
 	baseW : 400,
-	baseH: 440, 
+	baseH: 480, 
 	mode : "P2D",
-	baseUnit:10,
-	strokeWeight : 5
+	baseUnit:100,
+	minBaseUnitForColors : 50,
+	strokeWeight :10,
+	strokeColor :  {r:0,g:0,b:0},
+	backgroundColor: {r:255,g:255,b:255},
+	fillColors : [
+		{r:91,g:206,b:250},
+		{r:245,g:169,b:184},
+		{r:255,g:255,b:255},
+		{r:245,g:169,b:184},
+		{r:91,g:206,b:250},
+		{r:0,g:0,b:0}
+	]
 };
 
 function setup() {
@@ -81,18 +92,22 @@ function getLineLength(x1,y1,x2,y2){
 	return sqrt(diffX*diffX + diffY*diffY);
 }
 
-function draw() {
-	translate(width / 2, height / 2);
-	background(255);
-	stroke(0);
-	noFill();
+function getStokeWeight(){
 	var strokeWht = globals.strokeWeight;
-	if (globals.baseUnit  < 10){
-		strokeWht = round(globals.baseUnit  / 2);
+	if (globals.baseUnit  < 100){
+		strokeWht = round(globals.baseUnit  / 20);
 		if(strokeWht < 1) strokeWht = 1;
 	}
-	strokeWeight(strokeWht);
-	var sizeMultiplier = globals.baseUnit / 10;
+	return strokeWht;
+}
+
+function draw() {
+	translate(width / 2, height / 2);
+	background(globals.backgroundColor.r,globals.backgroundColor.g,globals.backgroundColor.b);
+	stroke(globals.strokeColor.r,globals.strokeColor.g,globals.strokeColor.b);
+	noFill();
+	strokeWeight(getStokeWeight());
+	var sizeMultiplier = globals.baseUnit / 100;
 	var w = globals.baseW * sizeMultiplier / 2;
 	var h = globals.baseH * sizeMultiplier / 4;
 
@@ -115,18 +130,44 @@ function draw() {
 	curve(controlPoint1.x, controlPoint1.y, firstLinePtrA.x, firstLinePtrA.y, firstLinePtrB.x, firstLinePtrB.y, controlPoint2.x, controlPoint2.y);
 	
     var spiralStartingPoint = {x:-delta12,y:centralRadius};
-	var len = round(getLineLength(spiralStartingPoint.x,spiralStartingPoint.y,0,0));
 	
-	var lastSpiralPoint = spiralOfLength(-3,spiralStartingPoint,-0.1,delta+len,centralRadius/3, 0.89,1,function(){
-			stroke(0);
-		});
+	var len = round(getLineLength(spiralStartingPoint.x,spiralStartingPoint.y,0,0)) + floor(globals.baseUnit / 100);
+	
+	var lastSpiralPoint = spiralOfLength(-3,spiralStartingPoint,-0.1,delta+len,centralRadius/3, 0.89,1);
 		
-		lastSpiralPoint.x += spiralStartingPoint.x;
-		lastSpiralPoint.y += spiralStartingPoint.y;
-		var horizontalCurveStartPoint = spiralStartingPoint;
-		horizontalCurveStartPoint.x -= centralRadius/3+delta12;
-		var horizontalCurveEndPoint = {x:firstLinePtrB.x, y:firstLinePtrB.y};
-		// we invert the control point (only one control point btw)
-		curve(-firstLinePtrA.x, -firstLinePtrA.y, spiralStartingPoint.x, spiralStartingPoint.y, firstLinePtrB.x, firstLinePtrB.y, -firstLinePtrA.x, -firstLinePtrA.y);
+	lastSpiralPoint.x += spiralStartingPoint.x;
+	lastSpiralPoint.y += spiralStartingPoint.y;
+	var horizontalCurveStartPoint = spiralStartingPoint;
+	horizontalCurveStartPoint.x -= centralRadius/3+delta12;
+	var horizontalCurveEndPoint = {x:firstLinePtrB.x, y:firstLinePtrB.y};
+	// we invert the control point (only one control point btw)
+	curve(-firstLinePtrA.x, -firstLinePtrA.y, spiralStartingPoint.x, spiralStartingPoint.y, firstLinePtrB.x, firstLinePtrB.y, -firstLinePtrA.x, -firstLinePtrA.y);
+	if(globals.minBaseUnitForColors <= globals.baseUnit){
+		colorIt();
+	}
 }
 
+function colorIt(){
+loadPixels();
+var strokeWht = getStokeWeight();
+var isBeforeLine = true;
+var density = displayDensity();
+var lineLength = globals.baseW * density * strokeWht *4;
+var modulo = globals.fillColors.length;
+  for (var i = 0; i < pixels.length; i+=4) {
+	var lineOffset = floor(i / lineLength);
+	var offset = lineOffset % modulo;
+    var r = pixels[i];
+	var g = pixels[i+1];
+	var b = pixels[i+2];
+	var a = pixels[i+3];
+	if(r == globals.strokeColor.r && g == globals.strokeColor.g && b == globals.strokeColor.b  ){
+		var colorChange = globals.fillColors[offset];
+		pixels[i] = colorChange.r;
+		pixels[i+1] = colorChange.g;
+		pixels[i+2] = colorChange.b;
+		
+	}
+  }
+  updatePixels();
+}
